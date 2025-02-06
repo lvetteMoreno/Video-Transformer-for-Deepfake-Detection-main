@@ -137,7 +137,7 @@ class DDFA():
          # 将鼻子部分的像素值复制到掩码中
         mask[uv_h//4:uv_h//2, uv_w//3:2*uv_w//3] = nose_region
 
-                    # 保存处理后的图像
+        #             #保存处理后的图像
         # nose_region_path = r"C:\Users\Robin\Desktop\111\nose_region_masked.png"
         # cv2.imwrite(nose_region_path, mask)
         # print(f'Saved nose region masked image to {nose_region_path}')
@@ -145,7 +145,7 @@ class DDFA():
         return mask,mask1
 
     def load_configs():
-        config_path = r'C:\Users\Robin\Desktop\Video-Transformer-for-Deepfake-Detection-main\Video-Transformer-for-Deepfake-Detection-main\configs\mb1_120x120.yml'
+        config_path = r'Video-Transformer-for-Deepfake-Detection-main\configs\mb1_120x120.yml'
         cfg = yaml.load(open(config_path), Loader=yaml.SafeLoader)
         # Init FaceBoxes and TDDFA, recommend using onnx flag
         onnx_flag = True  # or True to use ONNX to speed up
@@ -235,8 +235,8 @@ class DDFA():
 
             else:
                 param_lst, roi_box_lst = tddfa(img, boxes)
-                g_uv_coords = DDFA.load_uv_coords(r'C:\Users\Robin\Desktop\Video-Transformer-for-Deepfake-Detection-main\Video-Transformer-for-Deepfake-Detection-main\configs\BFM_UV.mat')
-                indices = _load(r'C:\Users\Robin\Desktop\Video-Transformer-for-Deepfake-Detection-main\Video-Transformer-for-Deepfake-Detection-main\configs\indices.npy')  # todo: handle bfm_slim
+                g_uv_coords = DDFA.load_uv_coords(r'Video-Transformer-for-Deepfake-Detection-main\configs\BFM_UV.mat')
+                indices = _load(r'Video-Transformer-for-Deepfake-Detection-main\configs\indices.npy')  # todo: handle bfm_slim
                 g_uv_coords = g_uv_coords[indices, :]
                 ver_lst = tddfa.recon_vers(param_lst, roi_box_lst, dense_flag=True)
                 a, c = DDFA.uv_tex(img, ver_lst, tddfa.tri, g_uv_coords, show_flag=False, wfp=None)

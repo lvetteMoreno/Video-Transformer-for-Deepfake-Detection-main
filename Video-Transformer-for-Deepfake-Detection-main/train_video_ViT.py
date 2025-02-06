@@ -1,19 +1,19 @@
-import random, torch
+import random
+import torch
 import torch.optim as optim
 from torch.optim.lr_scheduler import StepLR
 from tqdm import tqdm
 import os
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
+from LipForensics_mix.train_only import *
 
-
-#Import ViT Packages
+# Import ViT Packages
 from models.imagetransformer import ImageTransformer
 from models.videotransformer import VideoTransformer
 from models.DDFA import *
 from utils_ViT import load_pretrained_weights, PRETRAINED_MODELS, as_tuple, resize_positional_embedding_
 from models.transformer import *
 from dataset_utils.training_dataset_creation import VideoTrainDataset
-
 
 # Import 3DDFA Packages
 import yaml
@@ -22,11 +22,9 @@ from TDDFA import TDDFA
 import warnings
 import re
 
-from LipForensics.models.spatiotemporal_net import get_model
-model1 = get_model()
+from LipForensics_mix.models.spatiotemporal_net import get_model
+model1=get_model()
 
-
-print(torch.cuda.is_available())
 def ignore_onnxruntime_warnings(message, category, filename, lineno, file=None, line=None):
     if isinstance(message, UserWarning) and "Expected shape from model" in str(message):
         return None
@@ -49,18 +47,17 @@ seed_everything(seed)
 
 paths = []
 # 数据路径
-train_dir_real = r"D:\FF++\FaceForensics++\FaceForensics++\manipulated_sequences\DeepFakeDetection\c23\videos"
-train_dir_fake = r"D:\FF++\FaceForensics++\FaceForensics++\manipulated_sequences\FaceSwap\c23\videos"
-train_dir_fake_2 = r"D:\FF++\FaceForensics++\FaceForensics++\manipulated_sequences\Face2Face\c23\videos"
-train_dir_fake_3 = r"D:\FF++\FaceForensics++\FaceForensics++\manipulated_sequences\Deepfakes\c23\videos"
-train_dir_fake_4 = r"D:\FF++\FaceForensics++\FaceForensics++\manipulated_sequences\NeuralTextures\c23\videos"
+train_dir_real = r"FaceForensics++\original_sequences\youtube\c23\videos"
+train_dir_fake = r"FaceForensics++\manipulated_sequences\FaceSwap\c23\videos"
+train_dir_fake_2 = r"FaceForensics++\manipulated_sequences\Face2Face\c23\videos"
+train_dir_fake_3 = r"FaceForensics++\manipulated_sequences\Deepfakes\c23\videos"
+train_dir_fake_4 = r"FaceForensics++\manipulated_sequences\NeuralTextures\c23\videos"
 
-valid_dir_real = r"D:\FF++\FaceForensics++\FaceForensics++\original_sequences\actors\c23\videos"
-valid_dir_fake = r"D:\FF++\FaceForensics++\FaceForensics++\original_sequences\actors\c23\videos"
-valid_dir_fake_2 = r"D:\FF++\FaceForensics++\FaceForensics++\original_sequences\actors\c23\videos"
-valid_dir_fake_3 = r"D:\FF++\FaceForensics++\FaceForensics++\original_sequences\actors\c23\videos"
-valid_dir_fake_4 = r"D:\FF++\FaceForensics++\FaceForensics++\original_sequences\actors\c23\videos"
-
+valid_dir_real = r"FaceForensics++\original_sequences\actors\c23\videos"
+valid_dir_fake = r"FaceForensics++\manipulated_sequences\DeepFakeDetection\c23\videos"
+valid_dir_fake_2 = r"FaceForensics++\manipulated_sequences\DeepFakeDetection\c23\videos"
+valid_dir_fake_3 = r"FaceForensics++\manipulated_sequences\DeepFakeDetection\c23\videos"
+valid_dir_fake_4 = r"FaceForensics++\manipulated_sequences\DeepFakeDetection\c23\videos"
 
 paths.append(train_dir_real)
 paths.append(train_dir_fake)
@@ -78,15 +75,15 @@ train_loader, valid_loader = VideoTrainDataset.get_video_batches(paths, batch_si
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-model = VideoTransformer('B_16_imagenet1k', pretrained=True, image_size = 384, num_classes = 2,
-                        seq_embed=True, hybrid=True, variant='video', device=device)
+# 创建模型并将其迁移到设备
+model = VideoTransformer('B_16_imagenet1k', pretrained=True, image_size=384, num_classes=2,
+                         seq_embed=True, hybrid=True, variant='video', device=device).to(device)
 
 epochs = 15
 lr = 3e-3
-# gamma = 0.7
 
 # loss function
-criterion = nn.CrossEntropyLoss()
+criterion = nn.CrossEntropyLoss().to(device)  # 确保损失函数也在设备上
 # optimizer
 optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
 # scheduler
@@ -99,9 +96,16 @@ for epoch in range(epochs):
         data = data.to(device)
         label = label.to(device)
         output = model(data)
+        data2,length=tensor_process((data,label),(device))
+        output1=model1(data2,length)
         loss = criterion(output, label)
+        loss1 = criterion(output1, label)
+        a=0.5 
+       
+        b=1-a
+        loss2=a*loss+b*loss1
         optimizer.zero_grad()
-        loss.backward()
+        loss2.backward()
         optimizer.step()
         acc = (output.argmax(dim=1) == label).float().mean()
         epoch_accuracy += acc / len(train_loader)
@@ -110,7 +114,7 @@ for epoch in range(epochs):
     with torch.no_grad():
         epoch_val_accuracy = 0
         epoch_val_loss = 0
-        for data, label in (valid_loader):
+        for data, label in valid_loader:
             data = data.to(device)
             label = label.to(device)
             val_output = model(data)
@@ -122,4 +126,3 @@ for epoch in range(epochs):
     print(
         f"Epoch : {epoch+1} - loss : {epoch_loss:.4f} - acc: {epoch_accuracy:.4f} - val_loss : {epoch_val_loss:.4f} - val_acc: {epoch_val_accuracy:.4f}\n"
     )
-

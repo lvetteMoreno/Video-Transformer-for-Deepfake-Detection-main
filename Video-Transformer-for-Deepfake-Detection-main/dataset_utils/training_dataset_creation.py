@@ -216,8 +216,8 @@ class VideoDeepFakeSet(Dataset):
             raise RuntimeError(f"No frames found in video: {video_path}")
         frames = torch.stack(frames)
         frames = frames.permute(1, 0, 2, 3)  # 调整形状为 (channels, frames, height, width)
-        label = video_path.split('\\')[-2].split('.')[0].split('/')[-1]
-        label = 1 if label == "real" else 0
+        label = video_path.split('\\')[1]
+        label = 1 if label == "original_sequences" else 0
         return frames, label
 
 class VideoTrainDataset:

@@ -8,7 +8,7 @@ import cv2
 import onnxruntime
 
 import sys
-sys.path.append('c:/Users/Robin/Desktop/Video-Transformer-for-Deepfake-Detection-main/Video-Transformer-for-Deepfake-Detection-main/utils')
+sys.path.append(r'Video-Transformer-for-Deepfake-Detection-main/utils')
 from onnx import convert_to_onnx
 from utils.io import _load
 from utils.functions import (
@@ -28,8 +28,8 @@ class TDDFA_ONNX(object):
         # torch.set_grad_enabled(False)
 
         # load onnx version of BFM
-        bfm_fp =  r"C:\Users\Robin\Desktop\Video-Transformer-for-Deepfake-Detection-main\Video-Transformer-for-Deepfake-Detection-main\configs\bfm_noneck_v3.pkl"
-        bfm_onnx_fp = r'C:\Users\Robin\Desktop\Video-Transformer-for-Deepfake-Detection-main\Video-Transformer-for-Deepfake-Detection-main\configs\bfm_noneck_v3.onnx'
+        bfm_fp =  r"Video-Transformer-for-Deepfake-Detection-main\configs\bfm_noneck_v3.pkl"
+        bfm_onnx_fp = r'Video-Transformer-for-Deepfake-Detection-main\configs\bfm_noneck_v3.onnx'
         # if not osp.exists(bfm_onnx_fp):
         #     convert_bfm_to_onnx(
         #         bfm_onnx_fp,
@@ -52,7 +52,7 @@ class TDDFA_ONNX(object):
             'param_mean_std_fp', make_abs_path(f'configs/param_mean_std_62d_{self.size}x{self.size}.pkl')
         )
 
-        onnx_fp = r'C:\Users\Robin\Desktop\Video-Transformer-for-Deepfake-Detection-main\Video-Transformer-for-Deepfake-Detection-main\weights\mb1_120x120.onnx'
+        onnx_fp = r'Video-Transformer-for-Deepfake-Detection-main\weights\mb1_120x120.onnx'
 
         # convert to onnx online if not existed
         if onnx_fp is None or not osp.exists(onnx_fp):

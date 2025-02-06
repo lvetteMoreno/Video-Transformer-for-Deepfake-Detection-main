@@ -22,40 +22,7 @@ from utils.tddfa_util import (
 )
 
 make_abs_path = lambda fn: osp.join(osp.dirname(osp.realpath(__file__)), fn)
-# 定义特征区域的裁剪函数
-def crop_feature(img, roi_box, feature, output_dir=r"C:\Users\Robin\Desktop\111"):
-    x_min, y_min, x_max, y_max = roi_box
-    if feature == 'nose':
-        # 假设鼻子区域在脸部中心
-        x_center = (x_min + x_max) // 2
-        y_center = (y_min + y_max) // 2
-        width = (x_max - x_min) // 4
-        height = (y_max - y_min) // 4
-        cropped_img = img[y_center - height:y_center + height, x_center - width:x_center + width]
-    elif feature == 'mouth':
-        # 假设嘴巴区域在脸部下方
-        x_center = (x_min + x_max) // 2
-        y_center = y_max - (y_max - y_min) // 4
-        width = (x_max - x_min) // 3
-        height = (y_max - y_min) // 6
-        cropped_img = img[y_center - height:y_center + height, x_center - width:x_center + width]
-    else:
-        raise ValueError(f'Unknown feature {feature}')
-
-    # 保存裁剪后的图像
-    output_path = f'{output_dir}/{feature}_cropped.png'
-    cv2.imwrite(output_path, cropped_img)
-    print(f'Saved cropped {feature} image to {output_path}')
-
-    # 显示裁剪后的图像
-    cv2.imshow(f'Cropped {feature}', cropped_img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    return cropped_img
    
-
-
 class TDDFA(object):
     """TDDFA: named Three-D Dense Face Alignment (TDDFA)"""
 
@@ -64,7 +31,7 @@ class TDDFA(object):
 
         # load BFM
         self.bfm = BFMModel(
-            bfm_fp = kvs.get('bfm_fp', 'C:/Users/Robin/Desktop/Video-Transformer-for-Deepfake-Detection-main/Video-Transformer-for-Deepfake-Detection-main/configs/bfm_noneck_v3.pkl'),
+            bfm_fp = kvs.get('bfm_fp', 'Video-Transformer-for-Deepfake-Detection-main/configs/bfm_noneck_v3.pkl'),
             shape_dim=kvs.get('shape_dim', 40),
             exp_dim=kvs.get('exp_dim', 10)
         )

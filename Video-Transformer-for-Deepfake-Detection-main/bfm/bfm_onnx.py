@@ -37,7 +37,7 @@ class BFMModel_ONNX(nn.Module):
 
     def __init__(self, bfm_fp, shape_dim=40, exp_dim=10):
         super(BFMModel_ONNX, self).__init__()
-        bfm_fp = r'C:\Users\Robin\Desktop\Video-Transformer-for-Deepfake-Detection-main\Video-Transformer-for-Deepfake-Detection-main\configs\bfm_noneck_v3.pkl'
+        bfm_fp = r'Video-Transformer-for-Deepfake-Detection-main\configs\bfm_noneck_v3.pkl'
         bfm = _load(bfm_fp)
 
         _to_tensor = _numpy_to_tensor
