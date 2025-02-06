@@ -1,0 +1,18 @@
+[all]
+例子：
+python train_only.py --batch_size 32 --learning_rate 1e-3 --num_epochs 20 --device cuda:0
+
+参数说明：
+--data_folder：数据集路径，默认为 "data_process/dataset/output"。
+--batch_size：训练时的批次大小，默认为 16。
+--learning_rate：优化器的学习率，默认为 1e-4。
+--num_epochs：训练的轮数，默认为 10。
+--weights_folder：保存模型权重的文件夹，默认为 "models/weights"。
+--device：训练时使用的设备，默认为 "cuda:0"，可选值为 "cpu" 或 "cuda:0"。
+
+
+[prepare_and_train.py]
+例子：
+python prepare_and_train.py --data_folder ./data --batch_size 32 --learning_rate 1e-3 --num_epochs 20 --weights_folder ./weights --device cuda:0 --data_process_folder ./my_data_process
+额外参数说明：
+--data_process_folder，用于指定数据处理脚本所在的目录，默认值为 "data_process"。
